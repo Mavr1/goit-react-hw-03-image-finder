@@ -2,22 +2,27 @@ import React, { Component } from 'react';
 import Button from '../button/Button';
 
 class Searchbar extends Component {
-  state = { query: '' };
+  state = { input: '' };
 
   handleInput = (e) => {
-    this.setState({ query: e.target.value });
+    this.setState({ input: e.target.value });
   };
 
   render() {
     const onSubmit = (e) => {
       e.preventDefault();
-      this.props.handleSubmit(this.state.query, this.props.pageNumber);
+      this.props.handleSubmit(this.state.input, this.props.pageNumber);
     };
 
     return (
       <header className="Searchbar">
         <form className="SearchForm" onSubmit={onSubmit}>
-          <Button type="submit" />
+          <Button
+            type="submit"
+            buttonText="Search"
+            clsnButton="SearchForm-button"
+            clsnButtonName="SearchForm-button-label"
+          />
           <input
             className="SearchForm-input"
             type="text"

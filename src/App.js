@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import shortid from 'shortid';
 import Loader from 'react-loader-spinner';
 import Searchbar from './components/searchbar/Searchbar';
-import { pixaServices } from './services/apiServices';
+import { pixaGet } from './services/apiServices';
 import ImageGallery from './components/imageGallery/ImageGallery';
 import ImageGalleryItem from './components/imageGalleryItem/ImageGalleryItem';
 import './App.css';
@@ -12,49 +12,43 @@ import Modal from './components/modal/Modal';
 
 class App extends Component {
   state = {
-    query: '',
+    query: 'ocean',
     pageNumber: 1,
     images: [],
     loading: false,
     largeUrl: null,
+    alt: null,
   };
 
   componentDidMount() {
+    this.setState({ loading: true });
     this.searchQuery('ocean', 1);
   }
 
   componentDidUpdate(prevProps, prevState) {
     const { query, pageNumber } = this.state;
     if (prevState.query !== query) {
-      this.searchQuery(query, pageNumber);
+      this.setState({ loading: true });
+      this.searchQuery();
       return;
     }
     if (prevState.pageNumber !== pageNumber) {
-      this.loadMore(query, pageNumber);
+      this.setState({ loading: true });
+      this.loadMore();
       return;
     }
   }
 
-  searchQuery = async (query, pageNumber) => {
-    this.setState({ loading: true });
-    const response = await pixaServices.get.call(
-      pixaServices,
-      query,
-      pageNumber
-    );
+  searchQuery = async () => {
+    const response = await pixaGet(this.state.query, 1);
     const {
       data: { hits: images },
     } = response;
-    this.setState({ images, query: query, pageNumber: 1, loading: false });
+    this.setState({ loading: false, images: images });
   };
 
-  loadMore = async (query, pageNumber) => {
-    this.setState({ loading: true });
-    const response = await pixaServices.get.call(
-      pixaServices,
-      query,
-      pageNumber
-    );
+  loadMore = async () => {
+    const response = await pixaGet(this.state.query, this.state.pageNumber);
     const {
       data: { hits: images },
     } = response;
@@ -77,21 +71,28 @@ class App extends Component {
   };
 
   openModal = (e) => {
-    this.setState({ largeUrl: e.target.dataset.large });
+    this.setState({ largeUrl: e.target.dataset.large, alt: e.target.alt });
+  };
+
+  closeModal = (e) => {
+    e.target.dataset.type === 'overlay' && this.setState({ largeUrl: null });
   };
 
   render() {
-    // const { query, pageNumber } = this.state;
     return (
       <div className="App">
-        {this.state.largeUrl && <Modal src={this.state.largeUrl} />}
+        {this.state.largeUrl && (
+          <Modal
+            src={this.state.largeUrl}
+            alt={this.state.alt}
+            handleCloseModal={this.closeModal}
+          />
+        )}
         <Searchbar handleSubmit={this.getQuery} />
         {this.state.images.length > 0 && (
           <ImageGallery
             handleClick={this.increasePage}
             isLoading={this.state.loading}
-            // query={query}
-            // pageNumber={pageNumber}
           >
             {this.state.loading ? (
               <Loader

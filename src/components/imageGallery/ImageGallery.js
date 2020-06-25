@@ -1,14 +1,16 @@
 import React from 'react';
 import Button from '../button/Button';
 
-const ImageGallery = ({ children, handleClick }) => (
+const ImageGallery = ({ children, handleClick, isLoading }) => (
   <>
     <ul className="ImageGallery">{children}</ul>
-    <Button
-      buttonText="Load More"
-      clsnButton="Gallery-button"
-      handleClick={handleClick}
-    />
+    {!isLoading && (
+      <Button
+        buttonText="Load More"
+        clsnButton="Gallery-button"
+        handleClick={handleClick}
+      />
+    )}
   </>
 );
 

@@ -14,6 +14,18 @@ class App extends Component {
     this.searchQuery('ocean', 1);
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    const { query, pageNumber } = this.state;
+    if (prevState.query !== query) {
+      this.searchQuery(query, pageNumber);
+      return;
+    }
+    if (prevState.pageNumber !== pageNumber) {
+      this.loadMore(query, pageNumber);
+      return;
+    }
+  }
+
   searchQuery = async (query, pageNumber) => {
     const response = await pixaServices.get.call(
       pixaServices,
@@ -30,13 +42,13 @@ class App extends Component {
     const response = await pixaServices.get.call(
       pixaServices,
       query,
-      pageNumber + 1
+      pageNumber
     );
     const {
       data: { hits: images },
     } = response;
     this.setState((prevState) => ({
-      pageNumber: prevState.pageNumber + 1,
+      // pageNumber: prevState.pageNumber,
       images: [...prevState.images, ...images],
     }));
     window.scrollTo({
@@ -45,16 +57,24 @@ class App extends Component {
     });
   };
 
+  getQuery = (query) => {
+    this.setState({ query });
+  };
+
+  increasePage = () => {
+    this.setState({ pageNumber: this.state.pageNumber + 1 });
+  };
+
   render() {
-    const { query, pageNumber } = this.state;
+    // const { query, pageNumber } = this.state;
     return (
       <div className="App">
-        <Searchbar handleSubmit={this.searchQuery} pageNumber={pageNumber} />
+        <Searchbar handleSubmit={this.getQuery} />
         {this.state.images.length > 0 && (
           <ImageGallery
-            handleClick={this.loadMore}
-            query={query}
-            pageNumber={pageNumber}
+            handleClick={this.increasePage}
+            // query={query}
+            // pageNumber={pageNumber}
           >
             {this.state.images.map((item) => (
               <ImageGalleryItem

@@ -75,7 +75,8 @@ class App extends Component {
   };
 
   closeModal = (e) => {
-    e.target.dataset.type === 'overlay' && this.setState({ largeUrl: null });
+    (e.target.dataset.type === 'overlay' || e.code === 'Escape') &&
+      this.setState({ largeUrl: null });
   };
 
   render() {

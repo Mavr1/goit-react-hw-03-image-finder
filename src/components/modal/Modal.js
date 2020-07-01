@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 
 class Modal extends Component {
+  closeModal = (e) => this.props.handleCloseModal(e);
+
   componentDidMount() {
-    window.addEventListener('keydown', (e) => this.props.handleCloseModal(e));
+    window.addEventListener('keydown', this.closeModal);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('keydown', (e) =>
-      this.props.handleCloseModal(e)
-    );
+    window.removeEventListener('keydown', this.closeModal);
   }
 
   render() {
